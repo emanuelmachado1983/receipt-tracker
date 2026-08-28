@@ -1,0 +1,34 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Inicio</h1>
+      <p class="text-muted">Resumen de todos tus planes de pago.</p>
+    </div>
+    <button class="btn btn-primary" (click)="showAddModal.set(true)">+ Nuevo plan</button>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="search"
+      placeholder="Buscar por nombre de plan o deudor..."
+      [value]="searchTerm()"
+      (input)="onSearchChange($any($event.target).value)"
+    />
+  </div>
+
+  @if (plans().length) {
+    <div class="plan-grid">
+      @for (plan of plans(); track plan.id) {
+        <app-plan-card [plan]="plan" />
+      }
+    </div>
+  } @else {
+    <div class="empty-state card">
+      <p>No se encontraron planes.</p>
+    </div>
+  }
+</div>
+
+@if (showAddModal()) {
+  <app-add-plan-modal (save)="createPlan($event)" (close)="showAddModal.set(false)" />
+}

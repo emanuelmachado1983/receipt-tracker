@@ -1,0 +1,177 @@
+@if (plan(); as plan) {
+  <div class="container">
+    <a class="back-link" routerLink="/planes">← Volver a planes</a>
+
+    <div class="card plan-header">
+      <div class="plan-header-top">
+        <div>
+          <h1>{{ plan.name }}</h1>
+          <p class="text-muted">{{ plan.debtorName }}</p>
+          @if (plan.description) {
+            <p class="plan-description">{{ plan.description }}</p>
+          }
+        </div>
+        <span class="badge" [class]="'badge-' + plan.status">
+          <span class="status-dot" [class]="'status-dot-' + plan.status"></span>
+          {{ statusLabels[plan.status] }}
+        </span>
+      </div>
+
+      <div class="plan-header-amounts">
+        <div>
+          <span class="text-muted">Total</span>
+          <strong>{{ plan.totalAmount | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+        </div>
+        <div>
+          <span class="text-muted">Pagado</span>
+          <strong>{{ plan.totalPaid | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+        </div>
+        <div>
+          <span class="text-muted">Saldo pendiente</span>
+          <strong>{{ plan.remainingBalance | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+        </div>
+        <div>
+          <span class="text-muted">Fecha de inicio</span>
+          <strong>{{ plan.startDate | date: 'dd/MM/yyyy':'UTC' }}</strong>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="clampProgress(plan.progressPercent)"></div>
+      </div>
+
+      @if (plan.notes) {
+        <p class="plan-notes"><strong>Notas:</strong> {{ plan.notes }}</p>
+      }
+
+      <div class="plan-header-actions">
+        <button class="btn btn-secondary btn-sm" (click)="showEditPlanModal.set(true)">Editar plan</button>
+        @if (plan.status !== 'completed') {
+          <button class="btn btn-secondary btn-sm" (click)="markCompleted()">Marcar como completado</button>
+        }
+        <button class="btn btn-danger btn-sm" (click)="confirmingDeletePlan.set(true)">Eliminar plan</button>
+      </div>
+    </div>
+
+    <div class="receipts-section">
+      <div class="receipts-header">
+        <h2>Recibos</h2>
+        <button class="btn btn-primary" (click)="openAddReceipt()">+ Agregar recibo</button>
+      </div>
+
+      @if (receiptRows().length) {
+        <div class="receipts-table card">
+          <div class="receipts-row receipts-row-head">
+            <span>N°</span>
+            <span>Fecha</span>
+            <span>Monto</span>
+            <span>Método</span>
+            <span>Estado</span>
+            <span>Enviado</span>
+            <span>Notas</span>
+            <span>Saldo</span>
+            <span></span>
+          </div>
+          @for (receipt of receiptRows(); track receipt.id) {
+            <div class="receipts-row">
+              <span data-label="N°">#{{ receipt.receiptNumber }}</span>
+              <span data-label="Fecha">{{ receipt.date | date: 'dd/MM/yyyy':'UTC' }}</span>
+              <span data-label="Monto">{{ receipt.amount | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</span>
+              <span data-label="Método">{{ paymentMethodLabels[receipt.paymentMethod] }}</span>
+              <span data-label="Estado">
+                <span class="badge" [class]="'badge-receipt-' + receipt.status">{{ receiptStatusLabels[receipt.status] }}</span>
+              </span>
+              <span data-label="Enviado">{{ receipt.sent ? 'Sí' : 'No' }}</span>
+              <span data-label="Notas" class="text-muted">{{ receipt.notes || '—' }}</span>
+              <span data-label="Saldo">{{ receipt.runningBalance | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</span>
+              <span class="receipts-row-actions">
+                <button class="btn btn-text btn-sm" (click)="printReceipt(receipt)">Imprimir</button>
+                <button class="btn btn-text btn-sm" (click)="openEditReceipt(receipt)">Editar</button>
+                <button class="btn btn-text btn-sm btn-danger-text" (click)="confirmDeleteReceipt(receipt.id)">Eliminar</button>
+              </span>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state card">
+          <p>Todavía no hay recibos cargados para este plan.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (showEditPlanModal()) {
+    <app-add-plan-modal [plan]="plan" (save)="savePlan($event)" (close)="showEditPlanModal.set(false)" />
+  }
+
+  @if (showReceiptModal()) {
+    <app-add-receipt-modal
+      [receipt]="editingReceipt()"
+      (save)="saveReceipt($event)"
+      (close)="closeReceiptModal()"
+    />
+  }
+
+  @if (deletingReceiptId()) {
+    <app-confirm-dialog
+      title="Eliminar recibo"
+      message="Esta acción no se puede deshacer."
+      confirmLabel="Eliminar"
+      cancelLabel="Cancelar"
+      (confirmed)="deleteReceipt()"
+      (cancelled)="deletingReceiptId.set(null)"
+    />
+  }
+
+  @if (confirmingDeletePlan()) {
+    <app-confirm-dialog
+      title="Eliminar plan"
+      message="Se eliminará el plan y todos sus recibos asociados. Esta acción no se puede deshacer."
+      confirmLabel="Eliminar"
+      cancelLabel="Cancelar"
+      (confirmed)="deletePlan()"
+      (cancelled)="confirmingDeletePlan.set(false)"
+    />
+  }
+
+  @if (printingReceipt(); as receipt) {
+    <div class="print-only print-receipt">
+      <h1>Recibo #{{ receipt.receiptNumber }}</h1>
+      <p class="print-app-name">Receipt Tracker</p>
+
+      <div class="print-row">
+        <span>Plan</span>
+        <strong>{{ plan.name }}</strong>
+      </div>
+      <div class="print-row">
+        <span>Deudor</span>
+        <strong>{{ plan.debtorName }}</strong>
+      </div>
+      <div class="print-row">
+        <span>Fecha</span>
+        <strong>{{ receipt.date | date: 'dd/MM/yyyy':'UTC' }}</strong>
+      </div>
+      <div class="print-row">
+        <span>Monto</span>
+        <strong>{{ receipt.amount | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+      </div>
+      <div class="print-row">
+        <span>Método de pago</span>
+        <strong>{{ paymentMethodLabels[receipt.paymentMethod] }}</strong>
+      </div>
+      @if (receipt.notes) {
+        <div class="print-row">
+          <span>Notas</span>
+          <strong>{{ receipt.notes }}</strong>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="container">
+    <div class="empty-state card">
+      <p>No se encontró el plan.</p>
+      <a class="btn btn-primary" routerLink="/planes">Volver a planes</a>
+    </div>
+  </div>
+}

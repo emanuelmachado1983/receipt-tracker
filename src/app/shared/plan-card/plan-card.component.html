@@ -1,0 +1,46 @@
+<article class="card plan-card">
+  <div class="plan-card-header">
+    <div>
+      <h3>{{ plan.name }}</h3>
+      <p class="text-muted">{{ plan.debtorName }}</p>
+    </div>
+    <span class="badge" [class]="'badge-' + plan.status">
+      <span class="status-dot" [class]="'status-dot-' + plan.status"></span>
+      {{ statusLabel }}
+    </span>
+  </div>
+
+  <div class="plan-card-amounts">
+    <div>
+      <span class="text-muted">Total</span>
+      <strong>{{ plan.totalAmount | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+    </div>
+    <div>
+      <span class="text-muted">Pagado</span>
+      <strong>{{ plan.totalPaid | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+    </div>
+    <div>
+      <span class="text-muted">Saldo</span>
+      <strong>{{ plan.remainingBalance | currency: plan.currency : 'symbol-narrow' : '1.0-2' }}</strong>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" [style.width.%]="clampedProgress"></div>
+  </div>
+  <span class="progress-label text-muted">{{ clampedProgress | number: '1.0-0' }}% pagado</span>
+
+  <div class="plan-card-footer">
+    <span class="text-muted">
+      Último recibo: {{ plan.lastReceiptDate ? (plan.lastReceiptDate | date: 'dd/MM/yyyy':'UTC') : 'Sin recibos' }}
+    </span>
+    <a class="btn btn-primary btn-sm" [routerLink]="['/planes', plan.id]">Ver plan</a>
+  </div>
+
+  @if (showActions) {
+    <div class="plan-card-secondary-actions">
+      <button class="btn btn-text btn-sm" (click)="edit.emit()">Editar</button>
+      <button class="btn btn-text btn-sm btn-danger-text" (click)="remove.emit()">Eliminar</button>
+    </div>
+  }
+</article>

@@ -1,0 +1,83 @@
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.plan-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    margin-top: 0.15rem;
+  }
+}
+
+.plan-card-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  strong {
+    font-size: 0.95rem;
+  }
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  align-self: flex-end;
+}
+
+.plan-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+
+  span {
+    font-size: 0.8rem;
+  }
+}
+
+.plan-card-secondary-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.6rem;
+}
+
+.btn-danger-text {
+  color: var(--color-danger);
+
+  &:hover {
+    color: var(--color-danger-dark);
+  }
+}

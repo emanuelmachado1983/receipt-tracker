@@ -1,0 +1,77 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  p {
+    margin-top: 0.25rem;
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  input {
+    flex: 1;
+    min-width: 16rem;
+  }
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.filter-chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: var(--color-bg);
+  }
+}
+
+.filter-chip-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  input {
+    min-width: 0 !important;
+  }
+}
